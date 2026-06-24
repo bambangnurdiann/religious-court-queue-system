@@ -86,10 +86,12 @@ export async function GET(
       (s) => s.queue_position < session[0].queue_position
     ).length
 
+    const s = session[0]
     return Response.json({
-      session: session[0],
+      ...s,
+      position: s.queue_position,
       positionAhead,
-      queueNumber: `${session[0].counter_code}${String(session[0].queue_position).padStart(3, '0')}`,
+      queueNumber: `${s.counter_code}${String(s.queue_position).padStart(3, '0')}`,
     })
   } catch (error) {
     console.error('[API] GET /api/sessions/token/[qr_token] error:', error)

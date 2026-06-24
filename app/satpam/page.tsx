@@ -98,12 +98,14 @@ export default function SatpamPortalPage() {
       setQueuedCard({
         qr_token: result.qr_token || result.token,
         card_number: result.card_number || result.number || formatCardNumber(counter.code, counter.nextNumber),
+        queue_number: result.queueNumber || '',
         counter_code: counter.code,
       })
     } catch {
       setQueuedCard({
         qr_token: `${counter.code}-${Date.now()}`,
         card_number: formatCardNumber(counter.code, counter.nextNumber),
+        queue_number: '',
         counter_code: counter.code,
       })
     }
