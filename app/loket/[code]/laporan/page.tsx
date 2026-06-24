@@ -127,7 +127,30 @@ export default function LaporanPage() {
     const rows = report.sessions.map((s, i) => [
       String(i + 1),
       s.card_number,
-      s.status,
+      mapStatus(s.status),
+      s.activated_at ? new Date(s.activated_at).toLocaleTimeString('id-ID') : '-',
+      s.called_at ? new Date(s.called_at).toLocaleTimeString('id-ID') : '-',
+      s.completed_at ? new Date(s.completed_at).toLocaleTimeString('id-ID') : '-',
+    ])
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `laporan-${code}-${date}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const mapStatus = (status: string) => {
+    switch (status) {
+      case 'done': return 'Selesai'
+      case 'skipped': return 'Dilewati'
+      case 'called': case 'serving': return 'Dipanggil'
+      case 'waiting': return 'Menunggu'
+      default: return status
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

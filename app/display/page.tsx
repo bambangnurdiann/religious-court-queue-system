@@ -140,6 +140,14 @@ export default function PublicDisplayPage() {
           if (attempt < RECONNECT_DELAYS.length) {
             setTimeout(() => { reconnectAttempt.current = attempt + 1; connectSocket() }, RECONNECT_DELAYS[attempt])
           }
+        })
+      } catch { /* silence */ }
+    }
+    connectSocket()
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect()
+    }
+  }, [])
 
   return (
     <div className="h-screen w-screen bg-gray-900 text-white overflow-hidden flex flex-col" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

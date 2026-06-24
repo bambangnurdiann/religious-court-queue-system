@@ -232,6 +232,9 @@ export default function SatpamPortalPage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
 
       {/* QR Display Screen */}
       {showQR && queuedCard && selectedCounter && (

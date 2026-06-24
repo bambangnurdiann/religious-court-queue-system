@@ -189,6 +189,10 @@ export default function VisitorQueuePage() {
           </div>
           <h1 className="text-2xl font-bold text-red-700 mb-2">Token Tidak Valid</h1>
           <p className="text-red-600 mb-6">{error || 'Token antrian tidak ditemukan atau sudah kadaluarsa.'}</p>
+        </div>
+      </div>
+    )
+  }
 
   // Active (waiting) or Almost Called
   if (pageState === 'active' || pageState === 'almost') {

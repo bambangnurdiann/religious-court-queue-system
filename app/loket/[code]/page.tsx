@@ -164,6 +164,7 @@ export default function CounterDashboardPage() {
           </button>
         </div>
 
+        {activeTab === 'antrian' && (
             <div className="mt-5 flex gap-3">
               <button onClick={handleCallNext} disabled={calling} className="flex-1 py-4 rounded-xl font-bold text-lg text-white transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2" style={{ backgroundColor: color.primary }}>
                 {calling ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" /> : (
@@ -179,9 +180,11 @@ export default function CounterDashboardPage() {
                 </button>
               )}
             </div>
-          </div>
+        )}
+      </div>
 
-          {/* Waiting List */}
+      {/* Waiting List */}
+      {activeTab === 'antrian' && (
           <div className="bg-white rounded-2xl shadow-md p-6">
             <h3 className="font-bold text-gray-900 mb-4">Daftar Tunggu</h3>
             {waitingList.length === 0 ? (
@@ -211,7 +214,6 @@ export default function CounterDashboardPage() {
               </div>
             )}
           </div>
-        </div>
       )}
     </div>
   )
