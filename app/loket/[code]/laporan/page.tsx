@@ -182,6 +182,7 @@ export default function LaporanPage() {
             )}
             Ekspor CSV
           </button>
+        </div>
 
         {loading ? (
           <div className="text-center py-12">

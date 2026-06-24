@@ -159,6 +159,7 @@ export default function VisitorQueuePage() {
     return () => {
       if (socketRef.current) { socketRef.current.emit('leave', { room: `visitor:${token}` }); socketRef.current.disconnect() }
     }
+  }, [token, pageState, fetchSession])
 
   // ===== RENDER =====
 
