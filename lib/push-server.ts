@@ -31,7 +31,8 @@ export async function notifyVisitorPosition(
   pushSubscription: any,
   queueNumber: string,
   counterCode: string,
-  positionAhead: number
+  positionAhead: number,
+  qrToken?: string
 ) {
   const counterNames: Record<string, string> = {
     A: 'Meja Informasi', B: 'Pendaftaran Perkara', C: 'Kasir', D: 'Pengambilan Produk', E: 'Meja E-Court'
@@ -45,7 +46,7 @@ export async function notifyVisitorPosition(
       badge: '/icon.svg',
       tag: 'queue-position',
       requireInteraction: positionAhead === 0,
-      data: { url: `/q/${queueNumber}` }
+      data: { url: qrToken ? `/q/${qrToken}` : `/q/${queueNumber}` }
     })
   }
 }
@@ -53,7 +54,8 @@ export async function notifyVisitorPosition(
 export async function notifyVisitorCalled(
   pushSubscription: any,
   queueNumber: string,
-  counterCode: string
+  counterCode: string,
+  qrToken?: string
 ) {
   const counterNames: Record<string, string> = {
     A: 'Meja Informasi', B: 'Pendaftaran Perkara', C: 'Kasir', D: 'Pengambilan Produk', E: 'Meja E-Court'
@@ -66,6 +68,6 @@ export async function notifyVisitorCalled(
     badge: '/icon.svg',
     tag: 'queue-called',
     requireInteraction: true,
-    data: { url: `/q/${queueNumber}` }
+    data: { url: qrToken ? `/q/${qrToken}` : `/q/${queueNumber}` }
   })
 }

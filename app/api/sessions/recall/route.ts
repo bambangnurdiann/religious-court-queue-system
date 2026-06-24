@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     // Re-send push notification if subscribed
     if (session.push_subscription) {
       try {
-        await notifyVisitorCalled(session.push_subscription, queueNumber, code)
+        await notifyVisitorCalled(session.push_subscription, queueNumber, code, session.qr_token)
       } catch (e) {
         console.error('[API] Recall push notification failed:', e)
       }

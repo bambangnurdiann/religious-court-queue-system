@@ -111,7 +111,8 @@ export async function POST(request: Request) {
         await notifyVisitorCalled(
           session.push_subscription,
           queueNumber,
-          code
+          code,
+          session.qr_token
         )
       } catch (e) {
         console.error('[API] Push notification failed:', e)
