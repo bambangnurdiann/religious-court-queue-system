@@ -6,20 +6,22 @@ import { getSocketIO } from '@/lib/socket-server'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { qr_token, counter_code } = body
+    const { qr_token, counter_code, card_number } = body
 
-    if (!qr_token || !counter_code) {
+    if (!counter_code) {
       return Response.json(
-        { error: 'qr_token dan counter_code wajib diisi.' },
+        { error: 'counter_code wajib diisi.' },
         { status: 400 }
       )
     }
+
+    const code = counter_code.toUpperCase()
 
     // Validate counter exists and is open
     const counter = await db
       .select()
       .from(counters)
-      .where(eq(counters.code, counter_code.toUpperCase()))
+      .where(eq(counters.code, code))
       .limit(1)
 
     if (!counter.length) {
@@ -36,18 +38,35 @@ export async function POST(request: Request) {
       )
     }
 
-    // Look up card by qr_token
-    const card = await db
-      .select()
-      .from(cards)
-      .where(eq(cards.qr_token, qr_token))
-      .limit(1)
+    let card: any[]
 
-    if (!card.length) {
-      return Response.json(
-        { error: 'QR token tidak valid. Kartu tidak ditemukan.' },
-        { status: 404 }
-      )
+    if (qr_token) {
+      // Look up existing card by qr_token
+      card = await db
+        .select()
+        .from(cards)
+        .where(eq(cards.qr_token, qr_token))
+        .limit(1)
+
+      if (!card.length) {
+        return Response.json(
+          { error: 'QR token tidak valid. Kartu tidak ditemukan.' },
+          { status: 404 }
+        )
+      }
+    } else {
+      // Auto-generate a new card
+      const newCardNumber = card_number || `${code}-${Date.now()}`
+      const newQrToken = crypto.randomUUID()
+
+      card = await db
+        .insert(cards)
+        .values({
+          userId: counter[0].userId,
+          card_number: newCardNumber,
+          qr_token: newQrToken,
+        })
+        .returning()
     }
 
     const today = new Date().toISOString().slice(0, 10)
@@ -58,7 +77,7 @@ export async function POST(request: Request) {
       .from(queue_sessions)
       .where(
         and(
-          eq(queue_sessions.qr_token, qr_token),
+          eq(queue_sessions.qr_token, card[0].qr_token),
           eq(queue_sessions.session_date, today)
         )
       )
@@ -129,6 +148,8 @@ export async function POST(request: Request) {
         session: newSession,
         queueNumber,
         position: nextPosition,
+        qr_token: card[0].qr_token,
+        card_number: card[0].card_number,
       },
       { status: 201 }
     )
