@@ -118,6 +118,51 @@ export default function VisitorQueuePage() {
     if ('Notification' in window && Notification.permission === 'granted') setPushEnabled(true)
   }, [])
 
+  const handleEnablePush = useCallback(async () => {
+    setSubscribing(true)
+    try {
+      const permission = await Notification.requestPermission()
+      if (permission !== 'granted') {
+        alert('Notifikasi tidak diizinkan. Silakan aktifkan di pengaturan browser.')
+        return
+      }
+      setPushEnabled(true)
+
+      // Get VAPID public key
+      const vapidRes = await fetch('/api/vapid-public-key')
+      const { publicKey } = await vapidRes.json()
+      if (!publicKey) return
+
+      // Subscribe to push
+      const registration = await navigator.serviceWorker.ready
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      })
+
+      // Save subscription to session
+      if (session?.id) {
+        await apiFetch(`/sessions/${session.id}/subscribe`, {
+          method: 'POST',
+          body: JSON.stringify({ subscription }),
+        })
+      }
+    } catch (e) {
+      console.error('Push subscription failed:', e)
+    } finally {
+      setSubscribing(false)
+    }
+  }, [session, setPushEnabled, setSubscribing])
+
+  function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+    const rawData = window.atob(base64)
+    const outputArray = new Uint8Array(rawData.length)
+    for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i)
+    return outputArray
+  }
+
   useEffect(() => {
     if (!token || pageState === 'loading' || pageState === 'invalid') return
     const connectSocket = () => {
