@@ -166,6 +166,10 @@ export default function VisitorQueuePage() {
   const fontSans = { fontFamily: "'Plus Jakarta Sans', sans-serif" }
   const fontMono = { fontFamily: "'JetBrains Mono', monospace" }
 
+
+  const counterColor = COUNTER_COLORS[session?.counter_code || 'A'] || COUNTER_COLORS.A
+  const counterName = COUNTER_NAMES[session?.counter_code || 'A'] || 'Meja Informasi'
+
   // Loading State
   if (pageState === 'loading') {
     return (
