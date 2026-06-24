@@ -1,0 +1,85 @@
+{
+  "name": "Pengadilan Agama Queue System",
+  "short_name": "Queue System",
+  "description": "Religious Court Queue Management System for Satpam, Counter operators, and visitors",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshots/satpam.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/counter.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/visitor.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Satpam Portal",
+      "short_name": "Satpam",
+      "description": "QR code scanning and queue card activation",
+      "url": "/satpam?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "Counter Dashboard",
+      "short_name": "Counter",
+      "description": "Manage your counter and queue",
+      "url": "/counter?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "any"
+        }
+      ]
+    },
+    {
+      "name": "Queue Status",
+      "short_name": "Queue",
+      "description": "Check your position in queue",
+      "url": "/visitor?utm_source=pwa_shortcut",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "any"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}
