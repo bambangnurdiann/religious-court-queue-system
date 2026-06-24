@@ -43,30 +43,7 @@ export default function CounterDashboard() {
 
   useEffect(() => {
     loadData()
-    
-    // Initialize Socket.io
-    try {
-      initializeSocket()
-      
-      // Listen for real-time queue updates
-      onQueueUpdate(() => {
-        if (selectedCounter && session) {
-          handleSelectCounter(selectedCounter)
-        }
-      })
-      
-      onCallNext(() => {
-        loadData()
-      })
-    } catch (error) {
-      console.error('[v0] Socket initialization error:', error)
-    }
-
-    return () => {
-      offQueueUpdate()
-      offCallNext()
-    }
-  }, [selectedCounter, session])
+  }, [])
 
   const loadData = async () => {
     setIsLoading(true)

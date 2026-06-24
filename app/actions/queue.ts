@@ -270,6 +270,65 @@ export async function getVisitorQueuePosition(cardId: number, sessionId: number)
 }
 
 // Push Notification Subscriptions
+// Visitor Queue Generation
+export async function generateVisitorQueueEntry(data: {
+  counterId: number
+  visitorName?: string
+}) {
+  const userId = await getUserId()
+
+  // Get or create today's session
+  let session = await getTodaySession()
+  if (!session.length) {
+    session = [await createDailySession()]
+  }
+
+  const sessionId = session[0].id
+
+  // Get current counter position
+  const counter = await db
+    .select()
+    .from(counters)
+    .where(and(eq(counters.id, data.counterId), eq(counters.userId, userId)))
+    .limit(1)
+
+  if (!counter.length) {
+    throw new Error('Counter not found')
+  }
+
+  // Get all entries for this counter in this session
+  const existingEntries = await getQueueEntriesByCounter(sessionId, data.counterId)
+  const nextPosition = existingEntries.length + 1
+  const queueNumber = `${counter[0].counterNumber}-${String(nextPosition).padStart(3, '0')}`
+
+  // Generate unique QR code
+  const qrCode = `QR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+  // Create queue card
+  const card = await createQueueCard({
+    qrCode,
+    cardNumber: queueNumber,
+  })
+
+  // Add queue entry
+  const entry = await addQueueEntry({
+    sessionId,
+    counterId: data.counterId,
+    queueCardId: card.id,
+    queueNumber,
+    visitorName: data.visitorName,
+    positionInQueue: nextPosition,
+  })
+
+  return {
+    card,
+    entry,
+    queueNumber,
+    qrCode,
+    position: nextPosition,
+  }
+}
+
 export async function subscribeToPushNotifications(
   cardId: number,
   subscription: PushSubscription

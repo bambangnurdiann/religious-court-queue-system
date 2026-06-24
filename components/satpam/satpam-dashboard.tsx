@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import QRCodeScanner from './qr-scanner'
 import CardActivationForm from './card-activation-form'
+import VisitorCounterSelection from './visitor-counter-selection'
 import { activateQueueCard, getQueueCardByQR } from '@/app/actions/queue'
 import { toast } from 'sonner'
 
 export default function SatpamDashboard() {
-  const [activeTab, setActiveTab] = useState<'scanner' | 'manual'>('scanner')
+  const [activeTab, setActiveTab] = useState<'visitor' | 'scanner' | 'manual'>('visitor')
   const [isProcessing, setIsProcessing] = useState(false)
   const [lastScannedCard, setLastScannedCard] = useState<any>(null)
 
@@ -70,6 +71,16 @@ export default function SatpamDashboard() {
       {/* Tab Navigation */}
       <div className="flex gap-2 border-b border-border">
         <button
+          onClick={() => setActiveTab('visitor')}
+          className={`px-4 py-2 font-medium transition-colors ${
+            activeTab === 'visitor'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          Pilih Loket (Pengunjung)
+        </button>
+        <button
           onClick={() => setActiveTab('scanner')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'scanner'
@@ -77,7 +88,7 @@ export default function SatpamDashboard() {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          QR Scanner
+          Scan QR Code
         </button>
         <button
           onClick={() => setActiveTab('manual')}
@@ -87,11 +98,20 @@ export default function SatpamDashboard() {
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
-          Manual Entry
+          Input Manual
         </button>
       </div>
 
       {/* Tab Content */}
+      {activeTab === 'visitor' && (
+        <div className="space-y-4">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <h2 className="mb-4 font-semibold text-foreground">Layanan Pengunjung</h2>
+            <VisitorCounterSelection />
+          </div>
+        </div>
+      )}
+
       {activeTab === 'scanner' && (
         <div className="space-y-4">
           <div className="rounded-lg border border-border bg-card p-4">
