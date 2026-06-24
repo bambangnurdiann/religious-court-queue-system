@@ -22,8 +22,11 @@ export async function GET(
     const today = new Date().toISOString().slice(0, 10)
 
     let session
+    const isUuid = isUUID(qr_token)
+    const isCard = isCardNumber(qr_token)
+    console.log('[sessions/token]', { qr_token, isUuid, isCard })
 
-    if (isUUID(qr_token)) {
+    if (isUuid) {
       // Query by UUID qr_token
       session = await db
         .select()
