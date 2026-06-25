@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { counters, queue_sessions } from '@/lib/db/schema'
+import { counters, cards, queue_sessions } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { getSocketIO } from '@/lib/socket-server'
 
@@ -55,6 +55,14 @@ export async function POST(request: Request) {
 
     const session = serving[0]
 
+    // Look up card_number via card_id
+    const card = await db
+      .select()
+      .from(cards)
+      .where(eq(cards.id, session.card_id))
+      .limit(1)
+    const cardNumber = card.length ? card[0].card_number : ''
+
     // Mark as skipped
     await db
       .update(queue_sessions)
@@ -69,7 +77,7 @@ export async function POST(request: Request) {
     // Emit socket events
     const io = getSocketIO()
     if (io) {
-      io.to(`visitor:${session.qr_token}`).emit('service_skipped', {
+      io.to(`visitor:${cardNumber}`).emit('service_skipped', {
         session_id: session.id,
         queueNumber,
         counter_code: code,

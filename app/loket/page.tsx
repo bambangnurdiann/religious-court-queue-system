@@ -42,15 +42,13 @@ export default function LoketSelectionPage() {
           name: COUNTER_NAMES[code as keyof typeof COUNTER_NAMES],
           isOpen: (c?.is_active as boolean) ?? (c?.is_open as boolean) ?? true,
           currentNumber: (c?.current_number as number) ?? null,
-          waitingCount: ((c?._count as { sessions?: number })?.sessions) ?? (c?.queue_count as number) ?? 0,
+          waitingCount: (c?.waiting_count as number) ?? 0,
         }
       })
       setCounters(mapped)
-    } catch {
-      const fallback: CounterInfo[] = ['A', 'B', 'C', 'D', 'E'].map(code => ({
-        code, name: COUNTER_NAMES[code as keyof typeof COUNTER_NAMES], isOpen: true, currentNumber: null, waitingCount: 0,
-      }))
-      setCounters(fallback)
+    } catch (err) {
+      console.error('Failed to fetch counters:', err)
+      setCounters([])
     } finally {
       setLoading(false)
     }

@@ -2,12 +2,7 @@ import { db } from '@/lib/db'
 import { cards, queue_sessions } from '@/lib/db/schema'
 import { eq, and, desc } from 'drizzle-orm'
 
-// Check if token is a valid UUID format
-function isUUID(str: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
-}
-
-// Check if token is a card_number format (e.g., "B-1782319659091")
+// Check if token is a card_number format (e.g., "A-001")
 function isCardNumber(str: string): boolean {
   return /^[A-E]-\d+$/i.test(str)
 }
@@ -17,58 +12,52 @@ export async function GET(
   { params }: { params: Promise<{ qr_token: string }> }
 ) {
   try {
-    const { qr_token } = await params
+    const { qr_token: identifier } = await params
 
     const today = new Date().toISOString().slice(0, 10)
 
-    let session
-    const isUuid = isUUID(qr_token)
-    const isCard = isCardNumber(qr_token)
-    console.log('[sessions/token]', { qr_token, isUuid, isCard })
-
-    if (isUuid) {
-      // Query by UUID qr_token
-      session = await db
-        .select()
-        .from(queue_sessions)
-        .where(
-          and(
-            eq(queue_sessions.qr_token, qr_token),
-            eq(queue_sessions.session_date, today)
-          )
-        )
-        .orderBy(desc(queue_sessions.created_at))
-        .limit(1)
-    } else if (isCardNumber(qr_token)) {
-      // Query by card_number via join
-      const result = await db
-        .select({
-          session: queue_sessions,
-        })
-        .from(queue_sessions)
-        .innerJoin(cards, eq(queue_sessions.card_id, cards.id))
-        .where(
-          and(
-            eq(cards.card_number, qr_token),
-            eq(queue_sessions.session_date, today)
-          )
-        )
-        .orderBy(desc(queue_sessions.created_at))
-        .limit(1)
-      session = result.map(r => r.session)
-    } else {
+    if (!isCardNumber(identifier)) {
       return Response.json(
-        { error: 'Format token tidak valid. Gunakan QR code atau nomor kartu.' },
+        { error: 'Format nomor kartu tidak valid. Gunakan format seperti A-001.' },
         { status: 400 }
       )
     }
+    // Look up card by card_number
+    const cardResult = await db
+      .select()
+      .from(cards)
+      .where(eq(cards.card_number, identifier))
+      .limit(1)
 
-    if (!session || !session.length) {
+    if (!cardResult.length) {
       return Response.json(
-        { error: 'Sesi antrian tidak ditemukan untuk token ini.' },
+        { error: 'Nomor kartu tidak ditemukan.' },
         { status: 404 }
       )
     }
+    const card = cardResult[0]
+
+    // Find queue_session for today by card_id
+    const sessionResult = await db
+      .select()
+      .from(queue_sessions)
+      .where(
+        and(
+          eq(queue_sessions.card_id, card.id),
+          eq(queue_sessions.session_date, today)
+        )
+      )
+      .orderBy(desc(queue_sessions.created_at))
+      .limit(1)
+
+    if (!sessionResult.length) {
+      return Response.json(
+        { error: 'Sesi antrian tidak ditemukan untuk nomor kartu ini.' },
+        { status: 404 }
+      )
+    }
+
+    const session = sessionResult
 
     // Also count how many waiting/called ahead of this session
     const ahead = await db

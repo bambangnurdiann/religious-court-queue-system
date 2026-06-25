@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { QRCodeSVG } from 'qrcode.react'
+import { useState, useEffect, useCallback } from 'react'
+
 import { COUNTER_COLORS, COUNTER_NAMES, formatCardNumber, formatDateID } from '@/lib/shared'
 
 const API_BASE = '/api'
@@ -27,7 +27,7 @@ interface CounterState {
 }
 
 interface QueuedCard {
-  qr_token: string
+
   card_number: string
   counter_code: string
 }
@@ -38,12 +38,12 @@ export default function SatpamPortalPage() {
   const [selectedCounter, setSelectedCounter] = useState<CounterState | null>(null)
   const [queuedCard, setQueuedCard] = useState<QueuedCard | null>(null)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [showQR, setShowQR] = useState(false)
+
   const [showSettings, setShowSettings] = useState(false)
-  const [countdown, setCountdown] = useState(30)
+
   const [settingsCounters, setSettingsCounters] = useState<CounterState[]>([])
   const [todayCards, setTodayCards] = useState<{ code: string; numbers: string[] }[]>([])
-  const countdownRef = useRef<NodeJS.Timeout | null>(null)
+
 
   const fetchCounters = useCallback(async () => {
     try {
@@ -75,18 +75,6 @@ export default function SatpamPortalPage() {
 
   useEffect(() => { fetchCounters() }, [fetchCounters])
 
-  useEffect(() => {
-    if (showQR && countdown > 0) {
-      countdownRef.current = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) { if (countdownRef.current) clearInterval(countdownRef.current); return 0 }
-          return prev - 1
-        })
-      }, 1000)
-    }
-    return () => { if (countdownRef.current) clearInterval(countdownRef.current) }
-  }, [showQR, countdown])
-
   const handleCounterTap = async (counter: CounterState) => {
     if (!counter.isOpen) return
     setSelectedCounter(counter)
@@ -96,14 +84,14 @@ export default function SatpamPortalPage() {
         body: JSON.stringify({ counter_code: counter.code }),
       })
       setQueuedCard({
-        qr_token: result.qr_token || result.token,
+
         card_number: result.card_number || result.number || formatCardNumber(counter.code, counter.nextNumber),
         queue_number: result.queueNumber || '',
         counter_code: counter.code,
       })
     } catch {
       setQueuedCard({
-        qr_token: `${counter.code}-${Date.now()}`,
+
         card_number: formatCardNumber(counter.code, counter.nextNumber),
         queue_number: '',
         counter_code: counter.code,
@@ -112,9 +100,9 @@ export default function SatpamPortalPage() {
     setShowConfirm(true)
   }
 
-  const handleConfirm = () => { setShowConfirm(false); setShowQR(true); setCountdown(30) }
-  const handleReprint = () => { setCountdown(30) }
-  const handleNewTicket = () => { setShowQR(false); setQueuedCard(null); setSelectedCounter(null); setCountdown(30); fetchCounters() }
+  const handleConfirm = () => { setShowConfirm(false) }
+
+  const handleNewTicket = () => { setQueuedCard(null); setSelectedCounter(null); fetchCounters() }
 
   const handleToggleCounter = async (code: string) => {
     try {
@@ -232,48 +220,6 @@ export default function SatpamPortalPage() {
                   Cetak
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-      {/* QR Display Screen */}
-      {showQR && queuedCard && selectedCounter && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6" style={{ backgroundColor: color.light }}>
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center animate-slide-in-up">
-            <p className="text-sm text-gray-500">Nomor Antrian Anda</p>
-            <h1 className="text-6xl md:text-7xl font-bold mt-2 mb-1" style={{ color: color.primary, fontFamily: "'JetBrains Mono', monospace" }}>
-              {queuedCard.card_number}
-            </h1>
-            <p className="text-gray-600">{selectedCounter.name}</p>
-            <div className="my-6 flex justify-center">
-              <div className="p-4 bg-white rounded-2xl border-2" style={{ borderColor: color.medium }}>
-                <QRCodeSVG
-                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/q/${queuedCard.qr_token}`}
-                  size={180}
-                  level="M"
-                  fgColor={color.primary}
-                />
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 mb-4">Pindai QR code untuk memantau status antrian Anda</p>
-            <div className="mb-5">
-              <div className="flex justify-between text-xs text-gray-500 mb-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                <span>Kedaluwarsa dalam</span>
-                <span>{countdown} detik</span>
-              </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-1000 ease-linear" style={{ backgroundColor: color.primary, width: `${(countdown / 30) * 100}%` }} />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button onClick={handleReprint} className="flex-1 py-3 rounded-xl border-2 font-semibold transition-all duration-200 hover:bg-gray-50 active:scale-95" style={{ borderColor: color.primary, color: color.primary }}>
-                Cetak Ulang
-              </button>
-              <button onClick={handleNewTicket} className="flex-1 py-3 rounded-xl font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95" style={{ backgroundColor: color.primary }}>
-                Buat Baru
-              </button>
             </div>
           </div>
         </div>

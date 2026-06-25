@@ -58,7 +58,7 @@ export default function PublicDisplayPage() {
         return d.code === code
       }) as Record<string, unknown> | undefined
       const cn = (c?.current_number as number) ?? null
-      const lastServedArr = (c?.last_served as string[]) || (c?.recent_numbers as string[]) || []
+      const lastServedArr = (c?.last_served as string[]) || []
       return {
         code,
         name: COUNTER_NAMES[code as keyof typeof COUNTER_NAMES],

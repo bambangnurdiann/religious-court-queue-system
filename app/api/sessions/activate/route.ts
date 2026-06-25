@@ -6,7 +6,7 @@ import { getSocketIO } from '@/lib/socket-server'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { qr_token, counter_code, card_number } = body
+    const { counter_code, card_number } = body
 
     if (!counter_code) {
       return Response.json(
@@ -40,31 +40,29 @@ export async function POST(request: Request) {
 
     let card: any[]
 
-    if (qr_token) {
-      // Look up existing card by qr_token
+    if (card_number) {
+      // Look up existing card by card_number
       card = await db
         .select()
         .from(cards)
-        .where(eq(cards.qr_token, qr_token))
+        .where(eq(cards.card_number, card_number))
         .limit(1)
 
       if (!card.length) {
         return Response.json(
-          { error: 'QR token tidak valid. Kartu tidak ditemukan.' },
+          { error: 'Nomor kartu tidak valid. Kartu tidak ditemukan.' },
           { status: 404 }
         )
       }
     } else {
       // Auto-generate a new card
-      const newCardNumber = card_number || `${code}-${Date.now()}`
-      const newQrToken = crypto.randomUUID()
+      const newCardNumber = `${code}-${Date.now()}`
 
       card = await db
         .insert(cards)
         .values({
           userId: counter[0].userId,
           card_number: newCardNumber,
-          qr_token: newQrToken,
         })
         .returning()
     }
@@ -77,7 +75,7 @@ export async function POST(request: Request) {
       .from(queue_sessions)
       .where(
         and(
-          eq(queue_sessions.qr_token, card[0].qr_token),
+          eq(queue_sessions.card_id, card[0].id),
           eq(queue_sessions.session_date, today)
         )
       )
@@ -121,7 +119,6 @@ export async function POST(request: Request) {
         userId: card[0].userId,
         session_date: today,
         queue_position: nextPosition,
-        qr_token: card[0].qr_token,
         counter_code: counter_code.toUpperCase(),
         card_id: card[0].id,
         status: 'waiting',
@@ -148,7 +145,6 @@ export async function POST(request: Request) {
         session: newSession,
         queueNumber,
         position: nextPosition,
-        qr_token: card[0].qr_token,
         card_number: card[0].card_number,
       },
       { status: 201 }

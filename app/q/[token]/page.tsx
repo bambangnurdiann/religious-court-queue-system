@@ -23,7 +23,6 @@ type SessionStatus = 'waiting' | 'called' | 'serving' | 'done' | 'expired'
 
 interface SessionData {
   id: string
-  qr_token: string
   card_number: string
   counter_code: string
   counter_name?: string
@@ -41,7 +40,7 @@ type PageState = 'loading' | 'invalid' | 'active' | 'almost' | 'called' | 'done'
 
 export default function VisitorQueuePage() {
   const params = useParams()
-  const token = params?.token as string
+  const cardNumber = params?.token as string
 
   const [pageState, setPageState] = useState<PageState>('loading')
   const [session, setSession] = useState<SessionData | null>(null)
@@ -82,23 +81,23 @@ export default function VisitorQueuePage() {
 
   // Fetch session data
   const fetchSession = useCallback(async () => {
-    if (!token) return
+    if (!cardNumber) return
     try {
-      const data = await apiFetch(`/sessions/token/${encodeURIComponent(token)}`)
+      const data = await apiFetch(`/sessions/token/${encodeURIComponent(cardNumber)}`)
       setSession(data)
       setPageState(determineState(data))
       return data
     } catch (err) {
       if (err instanceof Error && err.message.includes('tidak valid')) {
         setPageState('invalid')
-        setError('Token tidak valid')
+        setError('Nomor antrian tidak valid')
       } else {
         setPageState('invalid')
-        setError(err instanceof Error ? err.message : 'Token tidak valid')
+        setError(err instanceof Error ? err.message : 'Nomor antrian tidak valid')
       }
       return null
     }
-  }, [token])
+  }, [cardNumber])
 
   function determineState(s: SessionData): PageState {
     switch (s.status) {
@@ -164,12 +163,12 @@ export default function VisitorQueuePage() {
   }
 
   useEffect(() => {
-    if (!token || pageState === 'loading' || pageState === 'invalid') return
+    if (!cardNumber || pageState === 'loading' || pageState === 'invalid') return
     const connectSocket = () => {
       try {
         const socket = createSocket()
         socketRef.current = socket
-        socket.on('connect', () => { reconnectAttempt.current = 0; socket.emit('join', { room: `visitor:${token}` }) })
+        socket.on('connect', () => { reconnectAttempt.current = 0; socket.emit('join:visitor', cardNumber) })
         socket.on('number_called', (data: unknown) => {
           const d = data as { card_number?: string; counter_code?: string }
           if (d) {
@@ -192,7 +191,7 @@ export default function VisitorQueuePage() {
             setTimeout(() => { reconnectAttempt.current = attempt + 1; connectSocket() }, RECONNECT_DELAYS[attempt])
           }
         })
-        if (!socket.connected) socket.emit('join', { room: `visitor:${token}` })
+        if (!socket.connected) socket.emit('join:visitor', cardNumber)
       } catch {
         const pollInterval = setInterval(async () => {
           try { const data = await fetchSession(); if (!data) clearInterval(pollInterval) } catch { /* keep polling */ }
@@ -202,9 +201,9 @@ export default function VisitorQueuePage() {
     }
     connectSocket()
     return () => {
-      if (socketRef.current) { socketRef.current.emit('leave', { room: `visitor:${token}` }); socketRef.current.disconnect() }
+      if (socketRef.current) { socketRef.current.emit('leave', { room: `visitor:${cardNumber}` }); socketRef.current.disconnect() }
     }
-  }, [token, pageState, fetchSession])
+  }, [cardNumber, pageState, fetchSession])
 
   // ===== RENDER =====
 
@@ -227,7 +226,7 @@ export default function VisitorQueuePage() {
     )
   }
 
-  // Invalid Token
+  // Invalid Card Number
   if (pageState === 'invalid') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-red-50 p-6" style={fontSans}>
@@ -237,8 +236,8 @@ export default function VisitorQueuePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-red-700 mb-2">Token Tidak Valid</h1>
-          <p className="text-red-600 mb-6">{error || 'Token antrian tidak ditemukan atau sudah kadaluarsa.'}</p>
+          <h1 className="text-2xl font-bold text-red-700 mb-2">Nomor Antrian Tidak Valid</h1>
+          <p className="text-red-600 mb-6">{error || 'Nomor antrian tidak ditemukan atau sudah kadaluarsa.'}</p>
         </div>
       </div>
     )

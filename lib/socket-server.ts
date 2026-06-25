@@ -19,9 +19,9 @@ export function initSocketIO(httpServer: HTTPServer): SocketIOServer {
     })
 
     // Join visitor room
-    socket.on('join:visitor', (qrToken: string) => {
-      socket.join(`visitor:${qrToken}`)
-      console.log(`[Socket] ${socket.id} joined visitor:${qrToken}`)
+    socket.on('join:visitor', (cardNumber: string) => {
+      socket.join(`visitor:${cardNumber}`)
+      console.log(`[Socket] ${socket.id} joined visitor:${cardNumber}`)
     })
 
     socket.on('disconnect', () => {

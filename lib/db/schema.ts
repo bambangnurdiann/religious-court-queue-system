@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, serial, integer, varchar, uuid, date, jsonb, char } from 'drizzle-orm/pg-core'
+﻿import { pgTable, text, timestamp, boolean, serial, integer, varchar, uuid, date, jsonb, char } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 // --- Better Auth required tables -------------------------------------------
@@ -57,7 +57,7 @@ export const verification = pgTable('verification', {
 // --- App tables ------------------------------------------------------------
 // Always include a plain `userId` column so queries can be scoped per user.
 // Do NOT add a foreign key constraint (`.references(() => user.id, ...)`)
-// unless explicitly requested — FK constraints make iterating on the schema
+// unless explicitly requested â€” FK constraints make iterating on the schema
 // harder.
 
 // --- Queue Management System Tables ----------------------------------------
@@ -78,11 +78,10 @@ export const counters = pgTable('counters', {
 export const cards = pgTable('cards', {
   id: serial('id').primaryKey(),
   userId: text('userId').notNull(),
-  card_number: varchar('card_number', { length: 20 }).notNull(),
-  qr_token: uuid('qr_token')
-    .default(sql`uuid_generate_v4()`)
-    .notNull()
-    .unique(),
+  card_number: varchar('card_number', { length: 20 }).notNull().unique(),
+
+
+
   created_at: timestamp('created_at').notNull().defaultNow(),
 })
 
@@ -91,7 +90,7 @@ export const queue_sessions = pgTable('queue_sessions', {
   userId: text('userId').notNull(),
   session_date: date('session_date').notNull(),
   queue_position: integer('queue_position').notNull(),
-  qr_token: uuid('qr_token').notNull(),
+
   counter_code: char('counter_code', { length: 1 }).notNull(),
   card_id: integer('card_id').notNull(),
   status: varchar('status', { length: 50 }).notNull().default('waiting'), // 'waiting', 'called', 'serving', 'done', 'skipped', 'expired'

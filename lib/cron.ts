@@ -71,8 +71,8 @@ export function startCronJobs() {
 
       const io = getSocketIO()
       for (const session of expired) {
-        if (io && session.qr_token) {
-          io.to(`visitor:${session.qr_token}`).emit('session_expired', {
+        if (io) {
+          io.to(`counter:${session.counter_code}`).emit('session_expired', {
             message: 'Sesi antrian Anda telah berakhir',
             queueNumber: session.queue_position,
           })

@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { counters, queue_sessions } from '@/lib/db/schema'
+import { counters, cards, queue_sessions } from '@/lib/db/schema'
 import { eq, and, asc } from 'drizzle-orm'
 import { getSocketIO } from '@/lib/socket-server'
 import { notifyVisitorCalled } from '@/lib/push-server'
@@ -64,6 +64,14 @@ export async function POST(request: Request) {
     const session = waiting[0]
     const now = new Date()
 
+    // Look up card_number via card_id
+    const card = await db
+      .select()
+      .from(cards)
+      .where(eq(cards.id, session.card_id))
+      .limit(1)
+    const cardNumber = card.length ? card[0].card_number : ''
+
     // Update session to 'serving'
     await db
       .update(queue_sessions)
@@ -88,7 +96,7 @@ export async function POST(request: Request) {
     const io = getSocketIO()
     if (io) {
       // Notify the visitor
-      io.to(`visitor:${session.qr_token}`).emit('number_called', {
+      io.to(`visitor:${cardNumber}`).emit('number_called', {
         session_id: session.id,
         queueNumber,
         counter_code: code,
@@ -112,7 +120,7 @@ export async function POST(request: Request) {
           session.push_subscription,
           queueNumber,
           code,
-          session.qr_token
+          cardNumber
         )
       } catch (e) {
         console.error('[API] Push notification failed:', e)

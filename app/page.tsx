@@ -32,7 +32,7 @@ export default async function HomePage() {
       icon: '👤',
       bg: 'bg-orange-100',
       title: 'Cek Status Antrian',
-      desc: 'Masukkan token QR untuk melihat posisi antrian Anda',
+      desc: 'Masukkan nomor antrian untuk melihat posisi antrian Anda',
       label: 'Cek Status',
     },
     {

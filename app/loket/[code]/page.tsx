@@ -21,7 +21,6 @@ async function apiFetch(path: string, options?: RequestInit) {
 
 interface WaitingEntry {
   id: string
-  qr_token: string
   card_number: string
   position: number
   activated_at: string
@@ -71,8 +70,7 @@ export default function CounterDashboardPage() {
       if (c?.current_number != null) setCurrentCardNumber(formatCardNumber(code, c.current_number as number))
       if (nextCardData?.waiting_list) {
         setWaitingList((nextCardData.waiting_list as Array<Record<string, unknown>>).map((w: Record<string, unknown>, i: number) => ({
-          id: (w.id as string) || (w.qr_token as string) || String(i),
-          qr_token: w.qr_token as string,
+          id: w.id as string,
           card_number: (w.card_number as string) || formatCardNumber(code, (w.number as number) || i + 1),
           position: (w.position as number) || i + 1,
           activated_at: (w.activated_at as string) || new Date().toISOString(),
