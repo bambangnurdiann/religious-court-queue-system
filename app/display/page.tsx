@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { io as socketIO } from 'socket.io-client'
-import { COUNTER_COLORS, COUNTER_NAMES, formatCardNumber } from '@/lib/shared'
+import { COUNTER_NAMES, formatCardNumber } from '@/lib/shared'
 
 const API_BASE = '/api'
 const RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 16000, 30000]
@@ -163,7 +163,6 @@ export default function PublicDisplayPage() {
       {/* Counter Grid - 5 columns */}
       <div className="flex-1 grid grid-cols-5 gap-2 px-3 pb-16 pt-2">
         {counters.map(counter => {
-          const c = COUNTER_COLORS[counter.code as keyof typeof COUNTER_COLORS] || COUNTER_COLORS.A
           const isFlashing = flashCounter === counter.code
           return (
             <div

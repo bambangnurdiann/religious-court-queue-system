@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { COUNTER_COLORS, COUNTER_NAMES } from '@/lib/shared'
+import { COUNTER_NAMES } from '@/lib/shared'
 
 const API_BASE = '/api'
 
@@ -89,7 +89,6 @@ export default function LoketSelectionPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {counters.map(counter => {
-            const c = COUNTER_COLORS[counter.code as keyof typeof COUNTER_COLORS] || COUNTER_COLORS.A
             return (
               <button
                 key={counter.code}

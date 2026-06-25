@@ -155,7 +155,7 @@ export default function SatpamPortalPage() {
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </Link>
           <div>
-          <h1 className="text-lg font-bold text-white">Portal SATPAM</h1>
+          <h1 className="text-lg font-bold text-white">Portal Satpam</h1>
           <p className="text-xs text-white/50">{formatDateID(new Date())}</p>
         </div>
         </div>
@@ -170,7 +170,7 @@ export default function SatpamPortalPage() {
       {/* Counter Grid */}
       <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto mt-4">
         {counters.map(counter => {
-          const c = COUNTER_COLORS[counter.code as keyof typeof COUNTER_COLORS]
+          
           return (
             <button
               key={counter.code}
@@ -179,7 +179,7 @@ export default function SatpamPortalPage() {
               className={`relative rounded-xl p-4 text-left transition-colors border-2 ${
                 counter.isOpen ? 'bg-white border-gray-200 hover:border-[#0C2340] cursor-pointer' : 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60'
               }`}
-              style={{ backgroundColor: counter.isOpen ? c.light : '#E5E7EB' }}
+              
             >
               {!counter.isOpen && (
                 <div className="absolute inset-0 bg-black/40 rounded-2xl flex items-center justify-center z-10">
@@ -239,7 +239,7 @@ export default function SatpamPortalPage() {
       )}
 
 {errorMsg && (
-        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg animate-slide-in-down">
+        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg ">
           <p>{errorMsg}</p>
           <button onClick={() => setErrorMsg('')} className="absolute top-1 right-2 text-white/80 hover:text-white">&times;</button>
         </div>

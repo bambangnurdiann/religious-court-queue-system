@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { COUNTER_COLORS, COUNTER_NAMES, formatCardNumber, formatDateID } from '@/lib/shared'
+import { COUNTER_NAMES } from '@/lib/shared'
 
 const API_BASE = '/api'
 
@@ -56,7 +56,6 @@ export default function LaporanPage() {
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState(false)
 
-  const color = COUNTER_COLORS[code as keyof typeof COUNTER_COLORS] || COUNTER_COLORS.A
   const counterName = COUNTER_NAMES[code as keyof typeof COUNTER_NAMES] || `Loket ${code}`
 
   const fetchReport = useCallback(async () => {
@@ -144,29 +143,20 @@ export default function LaporanPage() {
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <div className="text-white px-4 py-4" style={{ backgroundColor: color.primary }}>
-        <div className="flex items-center gap-3">
-          <button onClick={() => router.push(`/loket/${code}`)} className="p-1.5 rounded-full hover:bg-white/20 transition-all duration-200">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <div>
-            <h1 className="text-xl font-bold">Laporan {counterName}</h1>
-            <p className="text-sm opacity-80">Loket {code}</p>
-          </div>
-        </div>
-        <div className="flex gap-1 mt-4 bg-white/10 rounded-lg p-1">
-          <button onClick={() => router.push(`/loket/${code}`)} className="flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-all duration-200 text-white/80 hover:text-white">Antrian</button>
-          <button className="flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-all duration-200 bg-white text-gray-900">Laporan</button>
-        </div>
+      <div style={{ backgroundColor: '#0C2340' }} className="px-4 py-3 flex items-center gap-3">
+        <button onClick={() => router.push(`/loket/${code}`)} className="p-1.5 rounded hover:bg-white/10 transition-colors">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h1 className="text-base font-bold text-white">Laporan {counterName}</h1>
       </div>
 
       <div className="p-4 max-w-5xl mx-auto">
         <div className="mb-6 flex items-center gap-3">
           <label className="text-sm font-semibold text-gray-700">Tanggal:</label>
           <input type="date" value={date} onChange={e => setDate(e.target.value)} className="px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200" />
-          <button onClick={handleExportCSV} disabled={exporting} className="ml-auto px-4 py-2 rounded-lg bg-green-600 text-white font-semibold text-sm hover:bg-green-700 transition-all duration-200 disabled:opacity-50 flex items-center gap-2">
+          <button onClick={handleExportCSV} disabled={exporting} className="ml-auto px-4 py-2 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 flex items-center gap-2" style={{ backgroundColor: '#0C2340' }}">
             {exporting ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" /> : (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             )}
@@ -182,21 +172,21 @@ export default function LaporanPage() {
         ) : (
           <>
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-2xl shadow-md p-5 text-center">
+              <div className="bg-white rounded-xl shadow-sm p-5 text-center">
                 <p className="text-sm text-gray-500 mb-1">Total Dilayani</p>
-                <p className="text-3xl font-bold" style={{ fontFamily: "'JetBrains Mono', monospace", color: color.primary }}>{report?.total_served ?? 0}</p>
+                <p className="text-3xl font-bold" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#0C2340' }}>{report?.total_served ?? 0}</p>
               </div>
-              <div className="bg-white rounded-2xl shadow-md p-5 text-center">
+              <div className="bg-white rounded-xl shadow-sm p-5 text-center">
                 <p className="text-sm text-gray-500 mb-1">Dilewati</p>
-                <p className="text-3xl font-bold text-orange-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{report?.total_skipped ?? 0}</p>
+                <p className="text-3xl font-bold" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#0C2340' }}>{report?.total_skipped ?? 0}</p>
               </div>
-              <div className="bg-white rounded-2xl shadow-md p-5 text-center">
+              <div className="bg-white rounded-xl shadow-sm p-5 text-center">
                 <p className="text-sm text-gray-500 mb-1">Rata-rata Tunggu</p>
-                <p className="text-3xl font-bold text-gray-700" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{report?.avg_wait_minutes ?? 0}<span className="text-lg"> mnt</span></p>
+                <p className="text-3xl font-bold" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#0C2340' }}>{report?.avg_wait_minutes ?? 0}<span className="text-lg"> mnt</span></p>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
               <h3 className="font-bold text-gray-900 mb-4">Pengunjung per Jam</h3>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
@@ -205,13 +195,13 @@ export default function LaporanPage() {
                     <XAxis dataKey="hour" tick={{ fontSize: 12 }} />
                     <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                     <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} labelFormatter={(label) => `Jam ${label}:00`} />
-                    <Bar dataKey="served" name="Dilayani" fill={color.primary} radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="served" name="Dilayani" fill="#0C2340" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-md p-6 overflow-x-auto">
+            <div className="bg-white rounded-xl shadow-sm p-6 overflow-x-auto">
               <h3 className="font-bold text-gray-900 mb-4">Detail Sesi</h3>
               {report?.sessions && report.sessions.length > 0 ? (
                 <table className="w-full text-sm">

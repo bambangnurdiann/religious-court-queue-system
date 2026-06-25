@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { io as socketIO } from 'socket.io-client'
 import { useParams, useRouter } from 'next/navigation'
-import { COUNTER_COLORS, COUNTER_NAMES, formatCardNumber, formatWaitTime } from '@/lib/shared'
+import { COUNTER_NAMES, formatCardNumber, formatWaitTime } from '@/lib/shared'
 
 const API_BASE = '/api'
 const RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 16000, 30000]
@@ -43,7 +43,6 @@ export default function CounterDashboardPage() {
   const socketRef = useRef<ReturnType<typeof createSocket> | null>(null)
   const reconnectAttempt = useRef(0)
 
-  const color = COUNTER_COLORS[code as keyof typeof COUNTER_COLORS] || COUNTER_COLORS.A
   const counterName = COUNTER_NAMES[code as keyof typeof COUNTER_NAMES] || `Loket ${code}`
 
   function createSocket() {
@@ -137,69 +136,84 @@ export default function CounterDashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       {/* Header */}
-      <div className="text-white px-4 py-4" style={{ backgroundColor: color.primary }}>
-        <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/loket')} className="p-1.5 rounded-full hover:bg-white/20 transition-all duration-200">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div style={{ backgroundColor: '#0C2340' }} className="px-4 py-3">
+        <div className="flex items-center gap-3 mb-3">
+          <button onClick={() => router.push('/loket')} className="p-1.5 rounded hover:bg-white/10 transition-colors">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <div>
-            <h1 className="text-xl font-bold">{counterName}</h1>
-            <p className="text-sm opacity-80">Loket {code}</p>
+            <h1 className="text-base font-bold text-white">{counterName}</h1>
+            <p className="text-xs text-white/50">Loket {code}</p>
           </div>
         </div>
-        <div className="flex gap-1 mt-4 bg-white/10 rounded-lg p-1">
-          <button onClick={() => setActiveTab('antrian')} className={`flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-all duration-200 ${activeTab === 'antrian' ? 'bg-white text-gray-900' : 'text-white/80 hover:text-white'}`}>
-            Antrian
-          </button>
-          <button onClick={() => router.push(`/loket/${code}/laporan`)} className="flex-1 py-2 px-4 rounded-md text-sm font-semibold transition-all duration-200 text-white/80 hover:text-white">
+
+        {/* Tab */}
+        <div className="flex gap-1 bg-white/10 rounded-lg p-1">
+          <button onClick={() => setActiveTab('antrian')}
+            className={`flex-1 py-1.5 text-sm font-semibold rounded-md transition-colors ${
+              activeTab === 'antrian' ? 'bg-white text-gray-900' : 'text-white/70 hover:text-white'
+            }`}>Antrian</button>
+          <button onClick={() => router.push(`/loket/${code}/laporan`)}
+            className="flex-1 py-1.5 text-sm font-semibold rounded-md text-white/70 hover:text-white transition-colors">
             Laporan
           </button>
         </div>
 
+        {/* Tombol panggil */}
         {activeTab === 'antrian' && (
-            <div className="mt-5 flex gap-3">
-              <button onClick={handleCallNext} disabled={calling} className="flex-1 py-4 rounded-xl font-bold text-lg text-white transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2" style={{ backgroundColor: color.primary }}>
-                {calling ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" /> : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                )}
-                PANGGIL BERIKUTNYA
+          <div className="mt-3 flex gap-2">
+            <button onClick={handleCallNext} disabled={calling}
+              className="flex-1 py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+              style={{ backgroundColor: '#C8A84B', color: '#0C2340' }}>
+              {calling ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" /> : null}
+              PANGGIL BERIKUTNYA
+            </button>
+            {currentCardNumber && (
+              <button onClick={handleRecall} disabled={calling}
+                className="px-4 py-3 rounded-lg font-semibold text-sm border border-white/30 text-white hover:bg-white/10 transition-colors disabled:opacity-50">
+                Ulang
               </button>
-              {currentCardNumber && (
-                <button onClick={handleRecall} disabled={calling} className="px-5 py-4 rounded-xl font-semibold border-2 transition-all duration-200 hover:bg-gray-50 active:scale-95 disabled:opacity-50" style={{ borderColor: color.primary, color: color.primary }}>
-                  Panggil Ulang
-                </button>
-              )}
-            </div>
+            )}
+          </div>
         )}
       </div>
 
+      {/* Sedang Dilayani Banner */}
+      {currentCardNumber && activeTab === 'antrian' && (
+        <div className="mx-4 mt-3 px-4 py-2 rounded-lg flex items-center justify-between"
+          style={{ backgroundColor: '#E8EFF7' }}>
+          <span className="text-xs text-gray-500 font-medium">Sedang dilayani</span>
+          <span className="font-bold text-lg" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#C8A84B' }}>
+            {currentCardNumber}
+          </span>
+        </div>
+      )}
+
       {/* Waiting List */}
       {activeTab === 'antrian' && (
-          <div className="bg-white rounded-2xl shadow-md p-6">
-            <h3 className="font-bold text-gray-900 mb-4">Daftar Tunggu</h3>
+          <div className="bg-white rounded-xl p-4 mx-4 mt-3">
+            <h3 className="font-bold text-gray-900 mb-3 text-sm">Daftar Tunggu</h3>
             {waitingList.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">Belum ada antrian</p>
+              <p className="text-gray-400 text-center py-8 text-sm">Belum ada antrian</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {waitingList.map(entry => (
-                  <div key={entry.id} className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all duration-200">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0" style={{ backgroundColor: color.light, color: color.primary, fontFamily: "'JetBrains Mono', monospace" }}>{entry.position}</div>
+                  <div key={entry.id} className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 bg-white">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 text-white" style={{ backgroundColor: '#0C2340', fontFamily: "'JetBrains Mono', monospace" }}>{entry.position}</div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-lg" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{entry.card_number}</p>
-                      <p className="text-xs text-gray-500">Tunggu: {entry.estimated_wait_minutes > 0 ? `${entry.estimated_wait_minutes} menit` : formatWaitTime(entry.activated_at)}</p>
+                      <p className="font-bold text-base" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#0C2340' }}>{entry.card_number}</p>
+                      <p className="text-xs text-gray-400">Tunggu: {entry.estimated_wait_minutes > 0 ? `${entry.estimated_wait_minutes} menit` : formatWaitTime(entry.activated_at)}</p>
                     </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button onClick={handleRecall} title="Panggil Ulang" className="p-2 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-all duration-200">
+                    <div className="flex gap-1 flex-shrink-0">
+                      <button onClick={() => handleRecall()} title="Panggil Ulang" className="p-2 rounded-lg border border-gray-200 hover:bg-blue-50 hover:border-blue-300 transition-colors">
                         <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6" /></svg>
                       </button>
-                      <button onClick={() => handleDone(entry.id)} disabled={actionLoading === entry.id} title="Tandai Selesai" className="p-2 rounded-lg border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-all duration-200 disabled:opacity-50">
+                      <button onClick={() => handleDone(entry.id)} disabled={actionLoading === entry.id} title="Tandai Selesai" className="p-2 rounded-lg border border-gray-200 hover:bg-green-50 hover:border-green-300 transition-colors disabled:opacity-50">
                         {actionLoading === entry.id ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600" /> : <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>}
                       </button>
-                      <button onClick={() => handleSkip(entry.id)} disabled={actionLoading === entry.id} title="Lewati" className="p-2 rounded-lg border border-gray-200 hover:bg-orange-50 hover:border-orange-300 transition-all duration-200 disabled:opacity-50">
+                      <button onClick={() => handleSkip(entry.id)} disabled={actionLoading === entry.id} title="Lewati" className="p-2 rounded-lg border border-gray-200 hover:bg-orange-50 hover:border-orange-300 transition-colors disabled:opacity-50">
                         {actionLoading === entry.id ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-orange-600" /> : <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>}
                       </button>
                     </div>
