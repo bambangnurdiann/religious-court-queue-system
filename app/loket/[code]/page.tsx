@@ -87,7 +87,7 @@ export default function CounterDashboardPage() {
       try {
         const socket = createSocket()
         socketRef.current = socket
-        socket.on('connect', () => { reconnectAttempt.current = 0; socket.emit('join', { room: `counter:${code}` }) })
+        socket.on('connect', () => { reconnectAttempt.current = 0; socket.emit('join:counter', code) })
         socket.on('queue_update', () => { fetchData() })
         socket.on('disconnect', () => {
           const attempt = reconnectAttempt.current

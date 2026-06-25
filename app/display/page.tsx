@@ -114,7 +114,7 @@ export default function PublicDisplayPage() {
         socketRef.current = socket
         socket.on('connect', () => {
           reconnectAttempt.current = 0
-          ;['A', 'B', 'C', 'D', 'E'].forEach(code => socket.emit('join', { room: `counter:${code}` }))
+          ;['A', 'B', 'C', 'D', 'E'].forEach(code => socket.emit('join:counter', code))
         })
         socket.on('number_called', (data: unknown) => {
           const d = data as { code?: string; counter_code?: string; number?: number; card_number?: string }

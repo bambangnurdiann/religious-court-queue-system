@@ -40,7 +40,7 @@ type PageState = 'loading' | 'invalid' | 'active' | 'almost' | 'called' | 'done'
 
 export default function VisitorQueuePage() {
   const params = useParams()
-  const cardNumber = params?.token as string
+  const cardNumber = (params?.cardNumber || params?.token) as string
 
   const [pageState, setPageState] = useState<PageState>('loading')
   const [session, setSession] = useState<SessionData | null>(null)
@@ -83,7 +83,7 @@ export default function VisitorQueuePage() {
   const fetchSession = useCallback(async () => {
     if (!cardNumber) return
     try {
-      const data = await apiFetch(`/sessions/token/${encodeURIComponent(cardNumber)}`)
+      const data = await apiFetch(`/sessions/card/${encodeURIComponent(cardNumber)}`)
       setSession(data)
       setPageState(determineState(data))
       return data

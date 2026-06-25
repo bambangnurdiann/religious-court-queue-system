@@ -27,8 +27,8 @@ interface CounterState {
 }
 
 interface QueuedCard {
-
   card_number: string
+  queue_number: string
   counter_code: string
 }
 
@@ -43,6 +43,7 @@ export default function SatpamPortalPage() {
 
   const [settingsCounters, setSettingsCounters] = useState<CounterState[]>([])
   const [todayCards, setTodayCards] = useState<{ code: string; numbers: string[] }[]>([])
+  const [errorMsg, setErrorMsg] = useState('')
 
 
   const fetchCounters = useCallback(async () => {
@@ -62,12 +63,9 @@ export default function SatpamPortalPage() {
       })
       setCounters(full)
       setSettingsCounters(full)
-    } catch {
-      const allCodes = ['A', 'B', 'C', 'D', 'E']
-      const fallback: CounterState[] = allCodes.map(code => ({
-        code, name: COUNTER_NAMES[code], isOpen: true, nextNumber: 1, todayCount: 0,
-      }))
-      setCounters(fallback)
+    } catch (err) {
+      console.error('Failed to fetch counters:', err)
+      setCounters([])
     } finally {
       setLoading(false)
     }
@@ -90,6 +88,7 @@ export default function SatpamPortalPage() {
         counter_code: counter.code,
       })
     } catch {
+      setErrorMsg('Gagal mengaktifkan antrian. Silakan coba lagi.')
       setQueuedCard({
 
         card_number: formatCardNumber(counter.code, counter.nextNumber),
@@ -124,12 +123,9 @@ export default function SatpamPortalPage() {
     try {
       const data = await apiFetch('/sessions/today-cards')
       setTodayCards(data || [])
-    } catch {
-      const cards = settingsCounters.map(c => ({
-        code: c.code,
-        numbers: Array.from({ length: Math.min(c.todayCount, 10) }, (_, i) => formatCardNumber(c.code, i + 1)),
-      }))
-      setTodayCards(cards)
+    } catch (err) {
+      console.error('Failed to fetch today cards:', err)
+      setTodayCards([])
     }
   }
 
@@ -222,6 +218,13 @@ export default function SatpamPortalPage() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+{errorMsg && (
+        <div className="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg animate-slide-in-down">
+          <p>{errorMsg}</p>
+          <button onClick={() => setErrorMsg('')} className="absolute top-1 right-2 text-white/80 hover:text-white">&times;</button>
         </div>
       )}
 
