@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { io as socketIO } from 'socket.io-client'
 import { useParams } from 'next/navigation'
 import { COUNTER_COLORS, COUNTER_NAMES, formatCardNumber, formatWaitTime } from '@/lib/shared'
 
@@ -53,29 +54,11 @@ export default function VisitorQueuePage() {
 
   // Create socket helper
   function createSocket() {
-    // Dynamic import of socket.io-client
-    const io = (window as unknown as Record<string, unknown>).__io as ((url: string, opts?: Record<string, unknown>) => {
-      on: (event: string, cb: (...args: unknown[]) => void) => void
-      off: (event: string) => void
-      emit: (event: string, data: unknown) => void
-      disconnect: () => void
-      connected: boolean
-    }) | undefined
-
-    if (!io) {
-      // Simple fallback using native WebSocket or polling
-      return {
-        on: () => {},
-        off: () => {},
-        emit: () => {},
-        disconnect: () => {},
-        connected: false,
-      }
-    }
-    return io(API_BASE, {
+    return socketIO('/', {
+      path: '/api/socket',
       transports: ['websocket', 'polling'],
       reconnection: true,
-      reconnectionDelay: RECONNECT_DELAYS[0],
+      reconnectionAttempts: 6,
     })
   }
 

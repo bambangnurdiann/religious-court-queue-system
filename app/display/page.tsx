@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { io as socketIO } from 'socket.io-client'
 import { COUNTER_COLORS, COUNTER_NAMES, formatCardNumber } from '@/lib/shared'
 
 const API_BASE = '/api'
@@ -37,17 +38,12 @@ export default function PublicDisplayPage() {
   const reconnectAttempt = useRef(0)
 
   function createSocket() {
-    const io = (window as unknown as Record<string, unknown>).__io as ((url: string, opts?: Record<string, unknown>) => {
-      on: (event: string, cb: (...args: unknown[]) => void) => void
-      off: (event: string) => void
-      emit: (event: string, data: unknown) => void
-      disconnect: () => void
-      connected: boolean
-    }) | undefined
-    if (!io) {
-      return { on: () => {}, off: () => {}, emit: () => {}, disconnect: () => {}, connected: false }
-    }
-    return io(API_BASE, { transports: ['websocket', 'polling'], reconnection: true, reconnectionDelay: RECONNECT_DELAYS[0] })
+    return socketIO('/', {
+      path: '/api/socket',
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 6,
+    })
   }
 
   const mapCounters = (data: unknown[]): CounterDisplay[] => {

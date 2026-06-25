@@ -104,6 +104,14 @@ export async function POST(request: Request) {
         position: session.queue_position,
       })
 
+      // Also emit to counter room so public display updates
+      io.to(`counter:${code}`).emit('number_called', {
+        counter_code: code,
+        number: session.queue_position,
+        card_number: queueNumber,
+        position: session.queue_position,
+      })
+
       // Update counter room
       io.to(`counter:${code}`).emit('queue_update', {
         counter_code: code,

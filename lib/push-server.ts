@@ -46,7 +46,7 @@ export async function notifyVisitorPosition(
       badge: '/icon.svg',
       tag: 'queue-position',
       requireInteraction: positionAhead === 0,
-      data: { url: cardNumber ? `/q/${cardNumber}` : `/q/${queueNumber}` }
+      data: { url: '/' }
     })
   }
 }
@@ -68,6 +68,6 @@ export async function notifyVisitorCalled(
     badge: '/icon.svg',
     tag: 'queue-called',
     requireInteraction: true,
-    data: { url: cardNumber ? `/q/${cardNumber}` : `/q/${queueNumber}` }
+    data: { url: '/' }
   })
 }
