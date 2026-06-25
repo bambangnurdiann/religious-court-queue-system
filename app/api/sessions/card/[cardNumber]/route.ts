@@ -4,7 +4,7 @@ import { eq, and, desc } from 'drizzle-orm'
 
 // Check if token is a card_number format (e.g., "A-001")
 function isCardNumber(str: string): boolean {
-  return /^[A-E]-\d+$/i.test(str)
+  return /^[A-Z]-\d+$/i.test(str)
 }
 
 export async function GET(

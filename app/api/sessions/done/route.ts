@@ -6,7 +6,7 @@ import { getSocketIO } from '@/lib/socket-server'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { counter_code } = body
+    const { counter_code, session_id } = body
 
     if (!counter_code) {
       return Response.json(
@@ -33,27 +33,37 @@ export async function POST(request: Request) {
       )
     }
 
-    // Find current serving session
-    const serving = await db
-      .select()
-      .from(queue_sessions)
-      .where(
-        and(
-          eq(queue_sessions.counter_code, code),
-          eq(queue_sessions.session_date, today),
-          eq(queue_sessions.status, 'serving')
-        )
-      )
-      .limit(1)
+    // Find session — support session_id or fallback to serving
+    let sessionRows: any[]
 
-    if (!serving.length) {
+    if (session_id) {
+      sessionRows = await db
+        .select()
+        .from(queue_sessions)
+        .where(eq(queue_sessions.id, parseInt(String(session_id), 10)))
+        .limit(1)
+    } else {
+      sessionRows = await db
+        .select()
+        .from(queue_sessions)
+        .where(
+          and(
+            eq(queue_sessions.counter_code, code),
+            eq(queue_sessions.session_date, today),
+            eq(queue_sessions.status, 'serving')
+          )
+        )
+        .limit(1)
+    }
+
+    if (!sessionRows.length) {
       return Response.json(
-        { error: 'Tidak ada antrian yang sedang dilayani.' },
+        { error: 'Antrian tidak ditemukan.' },
         { status: 409 }
       )
     }
 
-    const session = serving[0]
+    const session = sessionRows[0]
 
     // Look up card_number via card_id
     const card = await db

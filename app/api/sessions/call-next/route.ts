@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       io.to(`counter:${code}`).emit('number_called', {
         counter_code: code,
         number: session.queue_position,
-        card_number: queueNumber,
+        card_number: cardNumber,
         position: session.queue_position,
       })
 

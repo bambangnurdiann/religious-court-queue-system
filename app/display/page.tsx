@@ -113,11 +113,11 @@ export default function PublicDisplayPage() {
           ;['A', 'B', 'C', 'D', 'E'].forEach(code => socket.emit('join:counter', code))
         })
         socket.on('number_called', (data: unknown) => {
-          const d = data as { code?: string; counter_code?: string; number?: number; card_number?: string }
+          const d = data as { code?: string; counter_code?: string; number?: number; position?: number; card_number?: string; queueNumber?: string }
           const code = d.code || d.counter_code
-          const number = d.number
+          const number = d.number ?? d.position
           if (code && number != null) {
-            const cardNumber = d.card_number || formatCardNumber(code, number)
+            const cardNumber = d.card_number || d.queueNumber || formatCardNumber(code, number)
             setFlashCounter(code)
             setTimeout(() => setFlashCounter(null), 500)
             setCounters(prev => prev.map(c =>
@@ -131,6 +131,7 @@ export default function PublicDisplayPage() {
             } catch { /* silence */ }
           }
         })
+        socket.on('queue_update', () => { fetchCounters() })
         socket.on('disconnect', () => {
           const attempt = reconnectAttempt.current
           if (attempt < RECONNECT_DELAYS.length) {

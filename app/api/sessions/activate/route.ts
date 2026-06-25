@@ -38,74 +38,24 @@ export async function POST(request: Request) {
       )
     }
 
-    let card: any[]
-
-    if (card_number) {
-      // Look up existing card by card_number
-      card = await db
-        .select()
-        .from(cards)
-        .where(eq(cards.card_number, card_number))
-        .limit(1)
-
-      if (!card.length) {
-        return Response.json(
-          { error: 'Nomor kartu tidak valid. Kartu tidak ditemukan.' },
-          { status: 404 }
-        )
-      }
-    } else {
-      // Auto-generate a new card
-      const newCardNumber = `${code}-${Date.now()}`
-
-      card = await db
-        .insert(cards)
-        .values({
-          userId: counter[0].userId,
-          card_number: newCardNumber,
-        })
-        .returning()
-    }
-
     const today = new Date().toISOString().slice(0, 10)
 
-    // Check if already activated today (duplicate)
-    const existing = await db
-      .select()
-      .from(queue_sessions)
-      .where(
-        and(
-          eq(queue_sessions.card_id, card[0].id),
-          eq(queue_sessions.session_date, today)
-        )
-      )
-      .limit(1)
-
-    if (existing.length) {
-      // Return existing session — duplicate activation
-      const ex = existing[0]
-      return Response.json({
-        session: ex,
-        queueNumber: `${ex.counter_code}${String(ex.queue_position).padStart(3, '0')}`,
-        position: ex.queue_position,
-      })
-    }
-
-    // Find next queue_position for this counter today
+    // Calculate next queue position first
     const maxPos = await db
-      .select({
-        max: sql<number>`COALESCE(MAX(${queue_sessions.queue_position}), 0)`,
-      })
+      .select({ max: sql<number>`COALESCE(MAX(${queue_sessions.queue_position}), 0)` })
       .from(queue_sessions)
-      .where(
-        and(
-          eq(queue_sessions.counter_code, counter_code.toUpperCase()),
-          eq(queue_sessions.session_date, today)
-        )
-      )
+      .where(and(eq(queue_sessions.counter_code, code), eq(queue_sessions.session_date, today)))
       .limit(1)
 
     const nextPosition = (maxPos[0]?.max ?? 0) + 1
+    const sequentialCardNumber = `${code}-${String(nextPosition).padStart(3, '0')}`
+
+    // Always create a new card with sequential number
+    const card = await db
+      .insert(cards)
+      .values({ userId: counter[0].userId, card_number: sequentialCardNumber })
+      .returning()
+
     const queueNumber = `${counter_code.toUpperCase()}${String(nextPosition).padStart(3, '0')}`
 
     // Determine expiry (end of day or 8 hours from now, whichever is sooner)
