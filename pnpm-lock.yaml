@@ -87,6 +87,9 @@ importers:
       '@types/node':
         specifier: ^24
         version: 24.10.4
+      '@types/node-cron':
+        specifier: ^3.0.11
+        version: 3.0.11
       '@types/pg':
         specifier: ^8.20.0
         version: 8.20.0
@@ -99,6 +102,9 @@ importers:
       '@types/uuid':
         specifier: ^10.0.0
         version: 10.0.0
+      '@types/web-push':
+        specifier: ^3.6.4
+        version: 3.6.4
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -1365,6 +1371,9 @@ packages:
   '@types/d3-timer@3.0.2':
     resolution: {integrity: sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw==}
 
+  '@types/node-cron@3.0.11':
+    resolution: {integrity: sha512-0ikrnug3/IyneSHqCBeslAhlK2aBfYek1fGo4bP4QnZPmiqSGRK+Oy7ZMisLWkesffJvQ1cqAcBnJC+8+nxIAg==}
+
   '@types/node@24.10.4':
     resolution: {integrity: sha512-vnDVpYPMzs4wunl27jHrfmwojOGKya0xyM3sH+UE5iv5uPS6vX7UIoh6m+vQc5LGBq52HBKPIn/zcSZVzeDEZg==}
 
@@ -1390,6 +1399,9 @@ packages:
 
   '@types/validate-npm-package-name@4.0.2':
     resolution: {integrity: sha512-lrpDziQipxCEeK5kWxvljWYhUvOiB2A9izZd9B2AFarYAkqZshb4lPbRs7zKEic6eGtH8V/2qJW+dPp9OtF6bw==}
+
+  '@types/web-push@3.6.4':
+    resolution: {integrity: sha512-GnJmSr40H3RAnj0s34FNTcJi1hmWFV5KXugE0mYWnYhgTAHLJ/dJKAwDmvPJYMke0RplY2XE9LnM4hqSqKIjhQ==}
 
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
@@ -4163,6 +4175,8 @@ snapshots:
 
   '@types/d3-timer@3.0.2': {}
 
+  '@types/node-cron@3.0.11': {}
+
   '@types/node@24.10.4':
     dependencies:
       undici-types: 7.16.0
@@ -4190,6 +4204,10 @@ snapshots:
   '@types/uuid@10.0.0': {}
 
   '@types/validate-npm-package-name@4.0.2': {}
+
+  '@types/web-push@3.6.4':
+    dependencies:
+      '@types/node': 24.10.4
 
   '@types/ws@8.18.1':
     dependencies:

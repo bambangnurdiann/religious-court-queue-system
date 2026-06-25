@@ -1,11 +1,11 @@
 // Shared utility types and helpers for the Religious Court queue management system
 
 export const COUNTER_COLORS: Record<string, { primary: string; light: string; medium: string; name: string }> = {
-  A: { primary: '#2563EB', light: '#DBEAFE', medium: '#60A5FA', name: 'Biru' },
-  B: { primary: '#059669', light: '#D1FAE5', medium: '#34D399', name: 'Hijau' },
-  C: { primary: '#D97706', light: '#FEF3C7', medium: '#FBBF24', name: 'Oranye' },
-  D: { primary: '#7C3AED', light: '#EDE9FE', medium: '#A78BFA', name: 'Ungu' },
-  E: { primary: '#0D9488', light: '#CCFBF1', medium: '#2DD4BF', name: 'Teal' },
+  A: { primary: '#0C2340', light: '#E8EFF7', medium: '#1B3A6B', name: 'Meja A' },
+  B: { primary: '#1B3A6B', light: '#EBF0F8', medium: '#2A52A0', name: 'Meja B' },
+  C: { primary: '#C8A84B', light: '#FBF4E0', medium: '#A8882B', name: 'Meja C' },
+  D: { primary: '#0C2340', light: '#E8EFF7', medium: '#1B3A6B', name: 'Meja D' },
+  E: { primary: '#1B3A6B', light: '#EBF0F8', medium: '#2A52A0', name: 'Meja E' },
 }
 
 export const COUNTER_NAMES: Record<string, string> = {

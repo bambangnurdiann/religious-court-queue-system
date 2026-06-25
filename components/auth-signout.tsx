@@ -23,8 +23,9 @@ export default function SignOut() {
       onClick={handleSignOut}
       variant="outline"
       size="sm"
+      className="text-white border-white/30 hover:bg-white/10 hover:text-white"
     >
-      Sign Out
+      Keluar
     </Button>
   )
 }

@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import SignOut from '@/components/auth-signout'
 
 export default async function HomePage() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -14,80 +15,57 @@ export default async function HomePage() {
     {
       href: '/satpam',
       icon: '🔐',
-      bg: 'bg-blue-100',
       title: 'Portal Satpam',
-      desc: 'Aktivasi kartu antrian dan pencetakan nomor antrian pengunjung',
-      label: 'Buka Portal',
+      desc: 'Aktivasi & penerbitan nomor antrian',
     },
     {
       href: '/loket',
       icon: '🏪',
-      bg: 'bg-green-100',
       title: 'Dashboard Loket',
-      desc: 'Panggil antrian, kelola layanan, dan lihat laporan harian',
-      label: 'Buka Dashboard',
-    },
-    {
-      href: '/visitor',
-      icon: '👤',
-      bg: 'bg-orange-100',
-      title: 'Cek Status Antrian',
-      desc: 'Masukkan nomor antrian untuk melihat posisi antrian Anda',
-      label: 'Cek Status',
+      desc: 'Panggil antrian & kelola layanan',
     },
     {
       href: '/display',
       icon: '📺',
-      bg: 'bg-purple-100',
       title: 'Tampilan Publik',
-      desc: 'Papan informasi antrian untuk ditampilkan di lobby',
-      label: 'Buka Tampilan',
+      desc: 'Papan informasi antrian lobby',
     },
   ]
 
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-gray-900">Sistem Antrian Pengadilan Agama</h1>
-          <p className="mt-1 text-sm text-gray-500">Portal Manajemen Antrian Digital</p>
+      <header className="px-6 py-4 flex items-center justify-between" style={{ backgroundColor: '#0C2340' }}>
+        <div>
+          <h1 className="text-lg font-bold text-white">Sistem Antrian Digital</h1>
+          <p className="text-xs text-white/50">Pengadilan Agama Pasarwajo</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-white/70 hidden sm:block">{session.user.name || session.user.email}</span>
+          <SignOut />
         </div>
       </header>
-
-      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <main className="max-w-2xl mx-auto px-4 py-10">
+        <div className="grid gap-4 sm:grid-cols-3">
           {cards.map((c) => (
             <Link key={c.href} href={c.href}>
-              <div className="group rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:border-blue-300 hover:shadow-md">
-                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${c.bg}`}>
-                  <span className="text-2xl">{c.icon}</span>
-                </div>
-                <h2 className="text-base font-semibold text-gray-900">{c.title}</h2>
-                <p className="mt-2 text-sm text-gray-500">{c.desc}</p>
-                <span className="mt-4 inline-block text-sm font-medium text-blue-600 group-hover:underline">
-                  {c.label} →
-                </span>
+              <div className="bg-white border border-gray-200 rounded-xl p-5 hover:border-[#0C2340] hover:shadow-sm transition-all cursor-pointer">
+                <span className="text-2xl">{c.icon}</span>
+                <h2 className="mt-3 font-semibold text-gray-900 text-sm">{c.title}</h2>
+                <p className="mt-1 text-xs text-gray-500">{c.desc}</p>
               </div>
             </Link>
           ))}
         </div>
-
-        <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Informasi Sistem</h3>
-          <div className="grid gap-4 sm:grid-cols-3">
+        <div className="mt-8 bg-white border border-gray-200 rounded-xl p-5">
+          <p className="text-xs text-gray-400 mb-3 font-medium uppercase tracking-wide">Informasi Login</p>
+          <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-sm text-gray-500">Login sebagai</p>
-              <p className="mt-1 font-semibold text-gray-900">{session.user.name || session.user.email}</p>
+              <p className="text-gray-400 text-xs">Pengguna</p>
+              <p className="font-semibold text-gray-800 mt-0.5">{session.user.name || '-'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Peran</p>
-              <p className="mt-1 font-semibold text-gray-900">Administrator</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Login Terakhir</p>
-              <p className="mt-1 font-semibold text-gray-900">
-                {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              </p>
+              <p className="text-gray-400 text-xs">Tanggal</p>
+              <p className="font-semibold text-gray-800 mt-0.5">{new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
             </div>
           </div>
         </div>

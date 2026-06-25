@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { counters, queue_sessions, daily_logs } from '@/lib/db/schema'
+import { counters, cards, queue_sessions, daily_logs } from '@/lib/db/schema'
 import { eq, and, sql, asc } from 'drizzle-orm'
 
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const counterId = parseInt(id, 10)
+    const code = id.toUpperCase()
 
     const { searchParams } = new URL(request.url)
     const dateParam = searchParams.get('date')
@@ -18,7 +18,7 @@ export async function GET(
     const counter = await db
       .select()
       .from(counters)
-      .where(eq(counters.id, counterId))
+      .where(eq(counters.code, code))
       .limit(1)
 
     if (!counter.length) {
@@ -28,7 +28,7 @@ export async function GET(
       )
     }
 
-    const code = counter[0].code
+
 
     // Get the daily log for this counter and date
     const log = await db
@@ -119,12 +119,14 @@ export async function GET(
       .select({
         id: queue_sessions.id,
         queue_position: queue_sessions.queue_position,
+        card_number: cards.card_number,
         status: queue_sessions.status,
         activated_at: queue_sessions.activated_at,
         called_at: queue_sessions.called_at,
         done_at: queue_sessions.done_at,
       })
       .from(queue_sessions)
+      .leftJoin(cards, eq(queue_sessions.card_id, cards.id))
       .where(
         and(
           eq(queue_sessions.counter_code, code),
@@ -136,16 +138,18 @@ export async function GET(
     return Response.json({
       counter: counter[0],
       date: targetDate,
-      log: log[0] || null,
-      live: {
-        total: totalResult[0]?.total ?? 0,
-        served: servedResult[0]?.served ?? 0,
-        skipped: skippedResult[0]?.skipped ?? 0,
-        waiting: waitingResult[0]?.waiting ?? 0,
-        average_wait_seconds: Math.round(waitAvg[0]?.avg ?? 0),
-        average_service_seconds: Math.round(svcAvg[0]?.avg ?? 0),
-      },
-      sessions,
+      total_served: Number(servedResult[0]?.served ?? 0),
+      total_skipped: Number(skippedResult[0]?.skipped ?? 0),
+      avg_wait_minutes: Math.round((waitAvg[0]?.avg ?? 0) / 60),
+      hourly_data: [],
+      sessions: sessions.map(s => ({
+        id: String(s.id),
+        card_number: s.card_number || `${code}-${String(s.queue_position).padStart(3,'0')}`,
+        status: s.status,
+        activated_at: s.activated_at?.toISOString() || '',
+        called_at: s.called_at?.toISOString() || null,
+        completed_at: s.done_at?.toISOString() || null,
+      })),
     })
   } catch (error) {
     console.error('[API] GET /api/stats/counter/[id] error:', error)

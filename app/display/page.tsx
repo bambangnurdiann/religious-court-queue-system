@@ -172,7 +172,7 @@ export default function PublicDisplayPage() {
               style={{ backgroundColor: '#1F2937' }}
             >
               {/* Counter Header */}
-              <div className="px-3 py-3 text-center" style={{ backgroundColor: c.primary }}>
+              <div className="px-3 py-3 text-center" style={{ backgroundColor: counter.code === 'C' ? '#C8A84B' : '#0C2340' }}>
                 <div className="text-xs font-semibold uppercase tracking-wider opacity-90">{counter.name}</div>
                 <div className="text-lg font-bold mt-0.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                   LOKET {counter.code}
@@ -183,9 +183,9 @@ export default function PublicDisplayPage() {
               <div className="flex-1 flex flex-col items-center justify-center py-6">
                 {counter.currentCardNumber ? (
                   <div
-                    className={`text-center transition-all duration-200 ${isFlashing ? 'animate-color-flash scale-110' : ''}`}
+                    className={`text-center transition-all duration-200 ${isFlashing ? 'scale-110' : ''}`}
                   >
-                    <p className="text-6xl lg:text-7xl xl:text-8xl font-bold leading-none" style={{ fontFamily: "'JetBrains Mono', monospace", color: c.medium }}>
+                    <p className="text-6xl lg:text-7xl xl:text-8xl font-bold leading-none" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#C8A84B' }}>
                       {counter.currentCardNumber}
                     </p>
                     <p className="text-xs text-gray-400 mt-3 font-medium">Sedang dilayani</p>

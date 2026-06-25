@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { COUNTER_COLORS, COUNTER_NAMES } from '@/lib/shared'
 
 const API_BASE = '/api'
@@ -76,8 +77,15 @@ export default function LoketSelectionPage() {
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Pilih Loket</h1>
-        <p className="text-gray-500 text-center mb-8">Pilih loket untuk mulai melayani antrian</p>
+        <div style={{ backgroundColor: '#0C2340' }} className="px-4 py-4 flex items-center gap-3 -mx-4 -mt-8 mb-6">
+        <Link href="/" className="p-1.5 rounded hover:bg-white/10 transition-colors">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+        </Link>
+        <div>
+          <h1 className="text-lg font-bold text-white">Dashboard Loket</h1>
+          <p className="text-xs text-white/50">Pilih loket untuk mulai</p>
+        </div>
+      </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {counters.map(counter => {
@@ -87,20 +95,20 @@ export default function LoketSelectionPage() {
                 key={counter.code}
                 onClick={() => handleSelect(counter)}
                 disabled={!counter.isOpen}
-                className={`rounded-2xl p-6 text-center transition-all duration-200 ease-out hover:scale-105 active:scale-95 shadow-md ${
-                  counter.isOpen ? 'cursor-pointer hover:shadow-lg' : 'cursor-not-allowed opacity-50'
+                className={`rounded-xl p-6 text-center transition-colors border-2 ${
+                  counter.isOpen ? 'bg-white border-gray-200 hover:border-[#0C2340] cursor-pointer' : 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-50'
                 }`}
-                style={{ backgroundColor: counter.isOpen ? c.light : '#E5E7EB' }}
+
               >
                 <div
                   className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-white text-3xl font-bold mb-3"
-                  style={{ backgroundColor: counter.isOpen ? c.primary : '#9CA3AF', fontFamily: "'JetBrains Mono', monospace" }}
+                  style={{ backgroundColor: counter.isOpen ? '#0C2340' : '#9CA3AF', fontFamily: "'JetBrains Mono', monospace" }}
                 >
                   {counter.code}
                 </div>
                 <h3 className="font-semibold text-gray-900">{counter.name}</h3>
                 {counter.currentNumber && (
-                  <p className="text-xs mt-1" style={{ color: c.primary, fontFamily: "'JetBrains Mono', monospace" }}>
+                  <p className="text-xs mt-1" style={{ color: '#C8A84B', fontFamily: "'JetBrains Mono', monospace" }}>
                     Melayani: {counter.code}-{String(counter.currentNumber).padStart(3, '0')}
                   </p>
                 )}

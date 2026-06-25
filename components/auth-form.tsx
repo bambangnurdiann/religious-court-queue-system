@@ -4,10 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card } from '@/components/ui/card'
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const router = useRouter()
@@ -40,23 +38,22 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   }
 
   return (
-    <main className="min-h-svh bg-background flex items-center justify-center px-4">
-      <Card className="w-full max-w-sm p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            {isSignUp ? 'Create an account' : 'Welcome back'}
+    <main className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#0C2340' }}>
+      <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-lg">
+        <div className="mb-6 text-center">
+          <div className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: '#0C2340' }}>
+            <span className="text-white text-xl">⚖️</span>
+          </div>
+          <h1 className="text-xl font-bold text-gray-900">
+            {isSignUp ? 'Daftar Akun' : 'Masuk ke Sistem'}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {isSignUp
-              ? 'Sign up to get started'
-              : 'Sign in to your account to continue'}
-          </p>
+          <p className="text-xs text-gray-400 mt-1">Pengadilan Agama Pasarwajo</p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {isSignUp && (
             <div className="flex flex-col gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Nama</Label>
               <Input
                 id="name"
                 value={name}
@@ -78,7 +75,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Kata Sandi</Label>
             <Input
               id="password"
               type="password"
@@ -96,25 +93,25 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
             </p>
           )}
 
-          <Button type="submit" disabled={loading} className="w-full">
+          <button type="submit" disabled={loading} className="w-full py-2.5 text-white font-semibold rounded-lg" style={{ backgroundColor: '#0C2340' }}>
             {loading
-              ? 'Please wait...'
+              ? 'Mohon tunggu...'
               : isSignUp
-                ? 'Create account'
-                : 'Sign in'}
-          </Button>
+                ? 'Daftar'
+                : 'Masuk'}
+          </button>
         </form>
 
         <p className="text-sm text-muted-foreground text-center mt-6">
-          {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+          {isSignUp ? 'Sudah punya akun? ' : 'Belum punya akun? '}
           <Link
             href={isSignUp ? '/sign-in' : '/sign-up'}
             className="text-foreground font-medium underline-offset-4 hover:underline"
           >
-            {isSignUp ? 'Sign in' : 'Sign up'}
+            {isSignUp ? 'Masuk' : 'Daftar'}
           </Link>
         </p>
-      </Card>
+      </div>
     </main>
   )
 }

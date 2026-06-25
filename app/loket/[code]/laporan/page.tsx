@@ -64,21 +64,11 @@ export default function LaporanPage() {
     try {
       const data = await apiFetch(`/stats/counter/${code}?date=${date}`)
       setReport({
-        total_served: data.total_served || data.total_dilayani || 0,
-        total_skipped: data.total_skipped || data.total_dilewati || 0,
-        avg_wait_minutes: data.avg_wait_minutes || data.rata_rata_waktu_tunggu || 0,
-        hourly_data: (data.hourly_data || data.per_jam || data.hourly || []).map((h: Record<string, unknown>, i: number) => ({
-          hour: (h.hour as string) || (h.jam as string) || String(i),
-          served: (h.served as number) || (h.count as number) || (h.jumlah as number) || 0,
-        })),
-        sessions: (data.sessions || []).map((s: Record<string, unknown>) => ({
-          id: (s.id as string) || '',
-          card_number: (s.card_number as string) || '',
-          status: (s.status as string) || '',
-          activated_at: (s.activated_at as string) || '',
-          called_at: (s.called_at as string) || null,
-          completed_at: (s.completed_at as string) || null,
-        })),
+        total_served: data.total_served ?? 0,
+        total_skipped: data.total_skipped ?? 0,
+        avg_wait_minutes: data.avg_wait_minutes ?? 0,
+        hourly_data: data.hourly_data || [],
+        sessions: data.sessions || [],
       })
     } catch {
       setReport({
